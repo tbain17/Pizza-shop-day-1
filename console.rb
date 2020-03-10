@@ -24,14 +24,5 @@ property2 = Property.new(
 )
 property2.save()
 
-
-
-
-
-
-
-
-
-
 binding.pry
 nil

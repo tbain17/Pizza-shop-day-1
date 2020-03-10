@@ -13,7 +13,16 @@ class Property
 
   def save()
     db = PG.connect({dbname: "property_tracker", host: "localhost"})
-    sql = " INSERT INTO property_tracker (address, property_value, number_bedrooms, year_built) VALUES ($1, $2, $3, $4) RETURNING *"
+    sql = " INSERT INTO property_tracker
+    (
+      address,
+      property_value,
+      number_bedrooms,
+      year_built
+    ) VALUES (
+      $1, $2, $3, $4
+    )
+    RETURNING *"
     values = [@address, @property_value, @number_bedrooms, @year_built]
     db.prepare("save", sql)
     @id = db.exec_prepared("save", values)[0]["id"].to_i
@@ -28,7 +37,9 @@ class Property
       property_value,
       number_bedrooms,
       year_built
-    ) = (
+    )
+    VALUES
+    (
       $1,
       $2,
       $3,
@@ -41,15 +52,6 @@ class Property
     db.close()
   end
 
-  def Property.all()
-    db = PG.connect({dbname: "property_tracker", host: "localhost"})
-    sql = "SELECT * FROM property_tracker"
-    db.prepare("all", sql)
-    properties = db.exec_prepared("all")
-    db.close()
-    return properties.map {|property| Property.new(property)}
-  end
-
   def delete()
     db = PG.connect({dbname: "property_tracker", host: "localhost"})
     sql = "DELETE FROM property_tracker WHERE id = $1"
@@ -57,6 +59,15 @@ class Property
     db.prepare("delete_one", sql)
     db.exec_prepared("delete_one", values)
     db.close()
+  end
+
+  def Property.all()
+    db = PG.connect({dbname: "property_tracker", host: "localhost"})
+    sql = "SELECT * FROM property_tracker"
+    db.prepare("all", sql)
+    properties = db.exec_prepared("all")
+    db.close()
+    return properties.map {|property| Property.new(property)} #exec_prepared returns an array like thing of hashes, this loops over the hashes creating a Property object for each one.
   end
 
   def Property.delete_all()
